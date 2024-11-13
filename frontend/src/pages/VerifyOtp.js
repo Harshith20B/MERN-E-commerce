@@ -26,7 +26,7 @@ const VerifyOtp = () => {
       // Send OTP to backend for verification
       const response = await axios.post('http://localhost:5000/api/auth/verify-otp', { otp, email });
 
-      alert(response.data.message);  // Display success message
+      //alert(response.data.message);  // Display success message
       navigate('/login');  // Redirect to login page after successful OTP verification
     } catch (error) {
       setError(error.response?.data?.message || 'Something went wrong.');

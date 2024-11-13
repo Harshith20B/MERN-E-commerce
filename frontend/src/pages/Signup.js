@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';  // Use navigate hook for routing
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);  // Track if OTP has been sent
-  const [otp, setOtp] = useState('');  // Track OTP input by user
+  const [otpSent, setOtpSent] = useState(false); // Track if OTP has been sent
+  const [otp, setOtp] = useState(''); // Track OTP input by user
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -26,10 +26,10 @@ const Signup = () => {
 
     try {
       const response = await axios.post('http://localhost:5000/api/auth/signup', formData);
-      alert(response.data.message);  // Display OTP sent message
-      localStorage.setItem('email', formData.email);  // Store email for OTP verification
-      setOtpSent(true);  // Show OTP form
-      navigate('/verify-otp');  // Redirect to OTP verification page
+      //alert(response.data.message); // Display OTP sent message
+      localStorage.setItem('email', formData.email); // Store email for OTP verification
+      setOtpSent(true); // Show OTP form
+      navigate('/verify-otp'); // Redirect to OTP verification page
     } catch (error) {
       alert(error.response.data.message);
     } finally {
@@ -47,8 +47,8 @@ const Signup = () => {
 
       const response = await axios.post('http://localhost:5000/api/auth/verify-otp', { otp, email });
 
-      alert(response.data.message);  // Display success message
-      navigate('/login');  // Redirect to login page after successful OTP verification
+      //alert(response.data.message); // Display success message
+      navigate('/login'); // Redirect to login page after successful OTP verification
     } catch (error) {
       alert(error.response?.data?.message || 'Something went wrong.');
     } finally {
@@ -59,7 +59,7 @@ const Signup = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <form
-        onSubmit={otpSent ? handleOtpSubmit : handleSubmit}  // Conditional form submission
+        onSubmit={otpSent ? handleOtpSubmit : handleSubmit} // Conditional form submission
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4"
       >
         <h2 className="text-2xl font-semibold text-center text-blue-600">

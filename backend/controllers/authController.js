@@ -103,59 +103,44 @@ const verifyOTP = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log('Login attempt with body:', {
-    email: req.body.email,
-    passwordReceived: !!req.body.password
-  });
-
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-
-    console.log('User verification status:', {
-      email,
-      isVerified: user.isVerified
-    });
-
-    if (!user.isVerified) {
-      return res.status(400).json({ message: 'Please verify your email before logging in' });
+    if (!user || !user.isVerified) {
+      return res.status(400).json({ message: user ? 'Verify email before logging in' : 'User not found' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match result:', isMatch);
-    
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    req.session.user = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      isVerified: user.isVerified
+    };
 
     res.status(200).json({
       message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified
-      }
+      user: req.session.user
     });
 
   } catch (error) {
-    console.error('Login error details:', {
-      message: error.message,
-      stack: error.stack
-    });
     res.status(500).json({ message: 'Something went wrong', error: error.message });
   }
 };
 
-module.exports = { signup, verifyOTP, login };
+const logout = (req, res) => {
+  try {
+    req.session.destroy(() => {
+      res.status(200).json({ message: 'Logout successful' });
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Something went wrong', error: error.message });
+  }
+};
+
+module.exports = { signup, verifyOTP, login, logout };

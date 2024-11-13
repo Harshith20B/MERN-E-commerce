@@ -8,6 +8,17 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+const session = require('express-session');
+
+// Add session middleware before your routes
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your_secret_key', // Add SESSION_SECRET in .env
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // set to true if using https
+  })
+);
 
 app.use('/api/auth', authRoutes);  // Use the routes for authentication
 console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);  // Log the credentials
